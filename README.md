@@ -1,2 +1,2 @@
-# python_sqllite_talk
+# python_sqlite_talk
 Code demonstrated in SQLite: Gimmes and Gotchas
