@@ -99,6 +99,7 @@ def main():
     with db.transaction():
         db.update(stock)
 
-# main()
+if __name__ == "__main__":
+    main()
 
 
