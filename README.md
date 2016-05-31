@@ -1,2 +1,4 @@
 # python_sqlite_talk
-Code demonstrated in SQLite: Gimmes and Gotchas
+Code and slides demonstrated in SQLite: Gotchas and Gimmes
+
+Updated after talk from feedback from the audience
