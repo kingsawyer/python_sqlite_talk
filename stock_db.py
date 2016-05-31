@@ -18,11 +18,12 @@ class Stock(object):
 
 class StockDB(object):
     def __init__(self):
-        ## 1. ADD check_same_thread... OperationalError: cannot commit - no transaction is active
+        ## 1. ADD check_same_thread... otherwise Python will complain.
         ## This allows us to use multiple threads on the same connection. Be sure to have sqlite built with
-        ## the Serialized option (default)
+        ## the Serialized option (default) and version 3.3.1 or later.
         ## 2. Change the isolation level to deferred so we can control transactions
         self._connection = sqlite3.connect('example.db', check_same_thread=False, isolation_level='DEFERRED')
+        ## WAL requires SQLite version 3.7 or later.
         self._connection.execute('PRAGMA journal_mode = WAL')
         self._lock = Lock()
 
@@ -64,11 +65,14 @@ class StockDB(object):
             cursor.execute('UPDATE stocks SET {} WHERE symbol = ?'.format(updates), values)
 
     # This is ok if each thread has its own connection. The writes will be serialized by SQLite
+    # I recommend sharing connections (below) because it it makes bookkeeping easier. If you do go with a separate
+    # connection per thread, consider overriding Thread.Run so you close the connection when Run completes.
+    # Otherwise, your unittests can have a hard time creating and deleting lots of temporary databases.
     # def transaction(self):
     #     return self._connection
 
     # This allows threads to share connections. When multiple threads are writing we perform the serialization
-    # by holding self._lock
+    # by holding self._lock. No performance penalty here from our lock because SQLite only allows one writer at time.
     @contextmanager
     def transaction(self):
         with self._lock:
